@@ -47,6 +47,11 @@ func TestTriangleOnRectangle(t *testing.T) {
 	if tr.IsColliding(rect2) {
 		t.Errorf("rectangle falsely indicated collision with triangle")
 	}
+
+	rect3 := NewRectangle(2, 4, 6, 3)
+	if !tr.IsColliding(rect3) {
+		t.Errorf("rectangle did not indicate tip of triangle inside")
+	}
 }
 
 func TestTriangleOnCircle(t *testing.T) {

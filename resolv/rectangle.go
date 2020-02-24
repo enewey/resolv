@@ -14,6 +14,10 @@ func NewRectangle(x, y, w, h int32) *Rectangle {
 	return r
 }
 
+func (r *Rectangle) pointCollides(x, y int32) bool {
+	return x > r.X && x < r.X+r.W && y > r.Y && y < r.Y+r.H
+}
+
 // IsColliding returns whether the Rectangle is colliding with the specified other Shape or not, including the other Shape
 // being wholly contained within the Rectangle.
 func (r *Rectangle) IsColliding(other Shape) bool {

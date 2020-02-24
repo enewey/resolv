@@ -18,17 +18,10 @@ func NewTriangle(x, y, x2, y2, x3, y3 int32) *Triangle {
 	e3 := (x - x3) * (y + y3)
 
 	if (e1 + e2 + e3) >= 0 {
-		t := &Triangle{X2: x2, Y2: y2, X3: x3, Y3: y3}
-		t.X = x
-		t.Y = y
-		return t
+		return &Triangle{BasicShape{X: x, Y: y}, x2, y2, x3, y3}
 	}
 
-	t := &Triangle{X2: x3, Y2: y3, X3: x2, Y3: y2}
-	t.X = x
-	t.Y = y
-	return t
-
+	return &Triangle{BasicShape{X: x, Y: y}, x3, y3, x2, y2}
 }
 
 // heron's formula - the area of a triangle made of these three points
@@ -76,7 +69,9 @@ func (t *Triangle) IsColliding(other Shape) bool {
 		return t.pointCollides(b.X, b.Y) || t.pointCollides(b.X2, b.Y2) ||
 			t.pointCollides(b.X3, b.Y3)
 	case *Rectangle:
-		return t.pointCollides(b.X, b.Y) || t.pointCollides(b.X+b.W, b.Y) ||
+		rectCollides := b.pointCollides(t.X, t.Y) || b.pointCollides(t.X2, t.Y2) || b.pointCollides(t.X3, t.Y3)
+
+		return rectCollides || t.pointCollides(b.X, b.Y) || t.pointCollides(b.X+b.W, b.Y) ||
 			t.pointCollides(b.X, b.Y+b.H) || t.pointCollides(b.X+b.W, b.Y+b.H)
 	case *Line:
 		return t.pointCollides(b.X, b.Y) || t.pointCollides(b.X2, b.Y2)

@@ -45,7 +45,8 @@ func (c *Circle) IsColliding(other Shape) bool {
 		return b.IsColliding(c)
 	case *Space:
 		return b.IsColliding(c)
-
+	case *Triangle:
+		return b.IsColliding(c)
 	}
 
 	fmt.Println("WARNING! Object ", other, " isn't a valid shape for collision testing against Circle ", c, "!")
