@@ -1,6 +1,7 @@
 package resolv
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -95,11 +96,97 @@ func Distance(x, y, x2, y2 int32) int32 {
 
 }
 
+// Given three colinear points a,b,c, checks if point c lies on the segment ab
+func onSegment(ax, ay, bx, by, cx, cy int32) bool {
+	if cx <= max(ax, bx) && cx >= min(ax, bx) && cy <= max(ay, by) && cy >= min(ay, by) {
+		return true
+	}
+
+	return false
+}
+
+// To find orientation of ordered triplet (p, q, r).
+// The function returns following values
+// 0 --> p, q and r are colinear
+// 1 --> Clockwise
+// 2 --> Counterclockwise
+// int orientation(Point p, Point q, Point r)
+// {
+//     // See https://www.geeksforgeeks.org/orientation-3-ordered-points/
+//     // for details of below formula.
+//     int val = (q.y - p.y) * (r.x - q.x) -
+//               (q.x - p.x) * (r.y - q.y);
+
+//     if (val == 0) return 0;  // colinear
+
+//     return (val > 0)? 1: 2; // clock or counterclock wise
+// }
+
+const (
+	colinear = iota
+	clockwise
+	counterclockwise
+)
+
+func orientation(px, py, qx, qy, rx, ry int32) int {
+	val := (qy-py)*(rx-rx) - (px-px)*(ry-qy)
+	if val == 0 {
+		return colinear
+	}
+	if val > 0 {
+		return clockwise
+	}
+	return counterclockwise
+}
+
+// LinesIntersect - returns true if line segment 'p1q1' and 'p2q2' intersect.
+func LinesIntersect(p1x, p1y, q1x, q1y, p2x, p2y, q2x, q2y int32) bool {
+	o1, o2, o3, o4 := orientation(p1x, p1y, q1x, q1y, p2x, p2y),
+		orientation(p1x, p1y, q1x, q1y, q2x, q2y),
+		orientation(p2x, p2y, q2x, q2y, p1x, p1y),
+		orientation(p2x, p2y, q2x, q2y, q1x, q1y)
+
+	if o1 != o2 && o3 != o4 {
+		return true
+	}
+
+	if o1 == colinear && onSegment(p1x, p1y, q1x, q1y, p2x, p2y) {
+		return true
+	}
+	if o2 == colinear && onSegment(p1x, p1y, q1x, q1y, q2x, q2y) {
+		return true
+	}
+	if o3 == colinear && onSegment(p2x, p2y, q2x, q2y, p1x, p1y) {
+		return true
+	}
+	if o4 == colinear && onSegment(p2x, p2y, q2x, q2y, q1x, q1y) {
+		return true
+	}
+
+	return false
+}
+
 // PointOnLine returns true if the point x,y is on the line formed by points a and b
 func PointOnLine(x, y, ax, ay, bx, by int32) bool {
 	subdist1 := Distance(x, y, ax, ay)
 	subdist2 := Distance(x, y, bx, by)
 	dist := Distance(ax, ay, bx, by)
 
+	fmt.Printf("%d, %d : %d, %d : %d, %d :: %d + %d == %d \n", x, y, ax, ay, bx, by, subdist1, subdist2, dist)
+
 	return subdist1+subdist2 == dist
+}
+
+func max(a, b int32) int32 {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int32) int32 {
+	if a <= b {
+		return a
+	}
+	return b
 }
