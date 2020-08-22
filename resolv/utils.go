@@ -1,7 +1,6 @@
 package resolv
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -96,8 +95,8 @@ func Distance(x, y, x2, y2 int32) int32 {
 
 }
 
-// Given three colinear points a,b,c, checks if point c lies on the segment ab
-func onSegment(ax, ay, bx, by, cx, cy int32) bool {
+// ColinearPointsOnSegment - Given three colinear points a,b,c, checks if point c lies on the segment ab
+func ColinearPointsOnSegment(ax, ay, bx, by, cx, cy int32) bool {
 	if cx <= max(ax, bx) && cx >= min(ax, bx) && cy <= max(ay, by) && cy >= min(ay, by) {
 		return true
 	}
@@ -129,7 +128,7 @@ const (
 )
 
 func orientation(px, py, qx, qy, rx, ry int32) int {
-	val := (qy-py)*(rx-rx) - (px-px)*(ry-qy)
+	val := (qy-py)*(rx-qx) - (qx-px)*(ry-qy)
 	if val == 0 {
 		return colinear
 	}
@@ -150,16 +149,16 @@ func LinesIntersect(p1x, p1y, q1x, q1y, p2x, p2y, q2x, q2y int32) bool {
 		return true
 	}
 
-	if o1 == colinear && onSegment(p1x, p1y, q1x, q1y, p2x, p2y) {
+	if o1 == colinear && ColinearPointsOnSegment(p1x, p1y, q1x, q1y, p2x, p2y) {
 		return true
 	}
-	if o2 == colinear && onSegment(p1x, p1y, q1x, q1y, q2x, q2y) {
+	if o2 == colinear && ColinearPointsOnSegment(p1x, p1y, q1x, q1y, q2x, q2y) {
 		return true
 	}
-	if o3 == colinear && onSegment(p2x, p2y, q2x, q2y, p1x, p1y) {
+	if o3 == colinear && ColinearPointsOnSegment(p2x, p2y, q2x, q2y, p1x, p1y) {
 		return true
 	}
-	if o4 == colinear && onSegment(p2x, p2y, q2x, q2y, q1x, q1y) {
+	if o4 == colinear && ColinearPointsOnSegment(p2x, p2y, q2x, q2y, q1x, q1y) {
 		return true
 	}
 
@@ -171,8 +170,6 @@ func PointOnLine(x, y, ax, ay, bx, by int32) bool {
 	subdist1 := Distance(x, y, ax, ay)
 	subdist2 := Distance(x, y, bx, by)
 	dist := Distance(ax, ay, bx, by)
-
-	fmt.Printf("%d, %d : %d, %d : %d, %d :: %d + %d == %d \n", x, y, ax, ay, bx, by, subdist1, subdist2, dist)
 
 	return subdist1+subdist2 == dist
 }

@@ -49,9 +49,9 @@ func (t *Triangle) pointCollides(x, y int32) bool {
 }
 
 func (t *Triangle) pointOnEdge(x, y int32) (bool, bool, bool) {
-	return PointOnLine(x, y, t.X, t.Y, t.X2, t.Y2),
-		PointOnLine(x, y, t.X2, t.Y2, t.X3, t.Y3),
-		PointOnLine(x, y, t.X3, t.Y3, t.X, t.Y)
+	return PointOnLine(t.X, t.Y, t.X2, t.Y2, x, y),
+		PointOnLine(t.X2, t.Y2, t.X3, t.Y3, x, y),
+		PointOnLine(t.X3, t.Y3, t.X, t.Y, x, y)
 }
 
 func (t *Triangle) segmentCollides(px, py, qx, qy int32) bool {
@@ -82,21 +82,18 @@ func (t *Triangle) IsColliding(other Shape) bool {
 
 	switch b := other.(type) {
 	case *Triangle:
-		// return t.pointCollides(b.X, b.Y) || t.pointCollides(b.X2, b.Y2) ||
-		// 	t.pointCollides(b.X3, b.Y3)
 		return t.segmentCollides(b.X, b.Y, b.X2, b.Y2) || t.segmentCollides(b.X2, b.Y2, b.X3, b.Y3) ||
-			t.segmentCollides(b.X3, b.Y3, b.X, b.Y)
+			t.segmentCollides(b.X3, b.Y3, b.X, b.Y) || t.pointCollides(b.X, b.Y) || t.pointCollides(b.X2, b.Y2) ||
+			t.pointCollides(b.X3, b.Y3)
 	case *Rectangle:
-		// rectCollides := b.pointCollides(t.X, t.Y) || b.pointCollides(t.X2, t.Y2) || b.pointCollides(t.X3, t.Y3)
+		rectCollides := b.pointCollides(t.X, t.Y) || b.pointCollides(t.X2, t.Y2) || b.pointCollides(t.X3, t.Y3) ||
+			t.pointCollides(b.X, b.Y) || t.pointCollides(b.X+b.W, b.Y) ||
+			t.pointCollides(b.X, b.Y+b.H) || t.pointCollides(b.X+b.W, b.Y+b.H)
 
-		// return rectCollides || t.pointCollides(b.X, b.Y) || t.pointCollides(b.X+b.W, b.Y) ||
-		// 	t.pointCollides(b.X, b.Y+b.H) || t.pointCollides(b.X+b.W, b.Y+b.H)
-
-		return t.segmentCollides(b.X, b.Y, b.X+b.W, b.Y) || t.segmentCollides(b.X+b.W, b.Y, b.X+b.W, b.Y+b.H) ||
+		return rectCollides || t.segmentCollides(b.X, b.Y, b.X+b.W, b.Y) || t.segmentCollides(b.X+b.W, b.Y, b.X+b.W, b.Y+b.H) ||
 			t.segmentCollides(b.X+b.W, b.Y+b.H, b.X, b.Y+b.H) || t.segmentCollides(b.X, b.Y+b.H, b.X, b.Y)
 	case *Line:
-		// return t.pointCollides(b.X, b.Y) || t.pointCollides(b.X2, b.Y2)
-		return t.segmentCollides(b.X, b.Y, b.X2, b.Y2)
+		return t.segmentCollides(b.X, b.Y, b.X2, b.Y2) || t.pointCollides(b.X, b.Y) || t.pointCollides(b.X2, b.Y2)
 	case *Circle:
 		// tests if a circle intersects a triangle.
 		// see http://www.phatcode.net/articles.php?id=459
