@@ -34,14 +34,19 @@ func herons(x1, y1, x2, y2, x3, y3 int32) float64 {
 // two of the other Triangle points. These three triangles are then added together. If the sum of the area of those
 // three triangles are the same as the area of the Triangle itself, then the point is contained inside the triangle.
 // See http://jeffreythompson.org/collision-detection/tri-point.php for a better explanation.
+// However, in order for this to be consistent with the rest of the resolv library, we need to NOT detect a collision
+// in the case where a point is exactly on one of the triangle's points.
 func (t *Triangle) pointCollides(x, y int32) bool {
 	a := herons(x, y, t.X2, t.Y2, t.X3, t.Y3)
 	b := herons(t.X, t.Y, x, y, t.X3, t.Y3)
 	c := herons(t.X, t.Y, t.X2, t.Y2, x, y)
 
 	self := t.Area()
+	pointOnEdge := (PointOnLine(x, y, t.X, t.Y, t.X2, t.Y2) ||
+		PointOnLine(x, y, t.X2, t.Y2, t.X3, t.Y3) ||
+		PointOnLine(x, y, t.X3, t.Y3, t.X, t.Y))
 
-	return a+b+c == self
+	return a+b+c == self && !pointOnEdge
 }
 
 // Area gets the area of the Triangle

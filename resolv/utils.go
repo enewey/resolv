@@ -94,3 +94,12 @@ func Distance(x, y, x2, y2 int32) int32 {
 	return int32(math.Sqrt(math.Abs(float64(ds))))
 
 }
+
+// PointOnLine returns true if the point x,y is on the line formed by points a and b
+func PointOnLine(x, y, ax, ay, bx, by int32) bool {
+	subdist1 := Distance(x, y, ax, ay)
+	subdist2 := Distance(x, y, bx, by)
+	dist := Distance(ax, ay, bx, by)
+
+	return subdist1+subdist2 == dist
+}
