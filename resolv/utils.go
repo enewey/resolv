@@ -97,7 +97,7 @@ func Distance(x, y, x2, y2 int32) int32 {
 
 // ColinearPointsOnSegment - Given three colinear points a,b,c, checks if point c lies on the segment ab
 func ColinearPointsOnSegment(ax, ay, bx, by, cx, cy int32) bool {
-	if cx <= max(ax, bx) && cx >= min(ax, bx) && cy <= max(ay, by) && cy >= min(ay, by) {
+	if cx < max(ax, bx) && cx > min(ax, bx) && cy < max(ay, by) && cy > min(ay, by) {
 		return true
 	}
 
@@ -146,6 +146,15 @@ func LinesIntersect(p1x, p1y, q1x, q1y, p2x, p2y, q2x, q2y int32) bool {
 		orientation(p2x, p2y, q2x, q2y, q1x, q1y)
 
 	if o1 != o2 && o3 != o4 {
+		// For our purposes, we don't want to consider it an intersection if the point is *on* the line
+
+		if PointOnLine(p1x, p1y, p2x, p2y, q2x, q2y) ||
+			PointOnLine(q1x, q1y, p2x, p2y, q2x, q2y) ||
+			PointOnLine(p2x, p2y, p1x, p1y, q1x, q1y) ||
+			PointOnLine(q2x, q2y, p1x, p1y, q1x, q1y) {
+			return false
+		}
+		// fmt.Printf("points not on line in line intersects %d,%d - %d,%d - %d,%d - %d,%d .. ", p1x, p1y, q1x, q1y, p2x, p2y, q2x, q2y)
 		return true
 	}
 
@@ -167,11 +176,19 @@ func LinesIntersect(p1x, p1y, q1x, q1y, p2x, p2y, q2x, q2y int32) bool {
 
 // PointOnLine returns true if the point x,y is on the line formed by points a and b
 func PointOnLine(x, y, ax, ay, bx, by int32) bool {
-	subdist1 := Distance(x, y, ax, ay)
-	subdist2 := Distance(x, y, bx, by)
-	dist := Distance(ax, ay, bx, by)
+	subdist1 := fDistance(x, y, ax, ay)
+	subdist2 := fDistance(x, y, bx, by)
+	dist := fDistance(ax, ay, bx, by)
 
 	return subdist1+subdist2 == dist
+}
+
+// fDistance returns the distance from one pair of X and Y values to another as a float
+func fDistance(x, y, x2, y2 int32) float64 {
+	dx := x - x2
+	dy := y - y2
+	ds := (dx * dx) + (dy * dy)
+	return math.Sqrt(math.Abs(float64(ds)))
 }
 
 func max(a, b int32) int32 {

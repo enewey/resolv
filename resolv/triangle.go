@@ -49,9 +49,9 @@ func (t *Triangle) pointCollides(x, y int32) bool {
 }
 
 func (t *Triangle) pointOnEdge(x, y int32) (bool, bool, bool) {
-	return PointOnLine(t.X, t.Y, t.X2, t.Y2, x, y),
-		PointOnLine(t.X2, t.Y2, t.X3, t.Y3, x, y),
-		PointOnLine(t.X3, t.Y3, t.X, t.Y, x, y)
+	return PointOnLine(x, y, t.X, t.Y, t.X2, t.Y2),
+		PointOnLine(x, y, t.X2, t.Y2, t.X3, t.Y3),
+		PointOnLine(x, y, t.X3, t.Y3, t.X, t.Y)
 }
 
 func (t *Triangle) segmentCollides(px, py, qx, qy int32) bool {
@@ -86,12 +86,13 @@ func (t *Triangle) IsColliding(other Shape) bool {
 			t.segmentCollides(b.X3, b.Y3, b.X, b.Y) || t.pointCollides(b.X, b.Y) || t.pointCollides(b.X2, b.Y2) ||
 			t.pointCollides(b.X3, b.Y3)
 	case *Rectangle:
-		rectCollides := b.pointCollides(t.X, t.Y) || b.pointCollides(t.X2, t.Y2) || b.pointCollides(t.X3, t.Y3) ||
-			t.pointCollides(b.X, b.Y) || t.pointCollides(b.X+b.W, b.Y) ||
+		rectCollides := b.pointCollides(t.X, t.Y) || b.pointCollides(t.X2, t.Y2) || b.pointCollides(t.X3, t.Y3)
+		triCollides := t.pointCollides(b.X, b.Y) || t.pointCollides(b.X+b.W, b.Y) ||
 			t.pointCollides(b.X, b.Y+b.H) || t.pointCollides(b.X+b.W, b.Y+b.H)
-
-		return rectCollides || t.segmentCollides(b.X, b.Y, b.X+b.W, b.Y) || t.segmentCollides(b.X+b.W, b.Y, b.X+b.W, b.Y+b.H) ||
+		segmentsCollide := t.segmentCollides(b.X, b.Y, b.X+b.W, b.Y) || t.segmentCollides(b.X+b.W, b.Y, b.X+b.W, b.Y+b.H) ||
 			t.segmentCollides(b.X+b.W, b.Y+b.H, b.X, b.Y+b.H) || t.segmentCollides(b.X, b.Y+b.H, b.X, b.Y)
+
+		return rectCollides || triCollides || segmentsCollide
 	case *Line:
 		return t.segmentCollides(b.X, b.Y, b.X2, b.Y2) || t.pointCollides(b.X, b.Y) || t.pointCollides(b.X2, b.Y2)
 	case *Circle:

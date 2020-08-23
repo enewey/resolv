@@ -1,6 +1,8 @@
 package resolv
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestTriangleOnTriangle(t *testing.T) {
 	t1 := NewTriangle(5, 5, 6, 6, 4, 6)
@@ -52,12 +54,19 @@ func TestTriangleOnRectangle(t *testing.T) {
 	if !tr.IsColliding(rect3) {
 		t.Errorf("rectangle did not indicate tip of triangle inside")
 	}
+}
 
+func TestTriangleRectangleEdge(t *testing.T) {
 	tr2 := NewTriangle(5, 5, 20, 5, 5, 20)
 
 	rect4 := NewRectangle(17, 17, 10, 10)
 	if tr2.IsColliding(rect4) {
 		t.Errorf("rectangle falsely indicated collision with nearby triangle")
+	}
+
+	rect5 := NewRectangle(20, 5, 10, 10)
+	if tr2.IsColliding(rect5) {
+		t.Errorf("rectangle falsely indicated collision at triangle corner")
 	}
 }
 
