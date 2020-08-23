@@ -70,6 +70,25 @@ func TestTriangleRectangleEdge(t *testing.T) {
 	}
 }
 
+func TestTriangleSlopeRect(t *testing.T) {
+
+	rect := NewRectangle(0, 0, 8, 8)
+
+	for baseSize := int32(6); baseSize < 30; baseSize++ {
+		tri := NewTriangle(0, 0, 0, baseSize, baseSize, 0)
+
+		var baseX, baseY int32 = baseSize, 0
+
+		for i := int32(0); i < baseSize+1; i++ {
+			x, y := baseX-i, baseY+i
+			rect.SetXY(x, y)
+			if tri.IsColliding(rect) {
+				t.Errorf("rect falsely indicated collision on triangle hypotenuse at %d %d for base size %d", x, y, baseSize)
+			}
+		}
+	}
+}
+
 func TestTriangleOnCircle(t *testing.T) {
 	tr := NewTriangle(10, 10, 18, 18, 2, 18)
 

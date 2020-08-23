@@ -11,4 +11,4 @@ Game
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-.vscode/launch.json
+**/.vscode/launch.json

@@ -176,11 +176,11 @@ func LinesIntersect(p1x, p1y, q1x, q1y, p2x, p2y, q2x, q2y int32) bool {
 
 // PointOnLine returns true if the point x,y is on the line formed by points a and b
 func PointOnLine(x, y, ax, ay, bx, by int32) bool {
-	subdist1 := fDistance(x, y, ax, ay)
-	subdist2 := fDistance(x, y, bx, by)
-	dist := fDistance(ax, ay, bx, by)
-
-	return subdist1+subdist2 == dist
+	seg1 := fDistance(x, y, ax, ay)
+	seg2 := fDistance(x, y, bx, by)
+	line := fDistance(ax, ay, bx, by)
+	// accuracy to the nearest ten-thousandth should be good enough for int32s!
+	return (seg1+seg2)-line <= 0.0001
 }
 
 // fDistance returns the distance from one pair of X and Y values to another as a float
@@ -192,14 +192,14 @@ func fDistance(x, y, x2, y2 int32) float64 {
 }
 
 func max(a, b int32) int32 {
-	if a >= b {
+	if a > b {
 		return a
 	}
 	return b
 }
 
 func min(a, b int32) int32 {
-	if a <= b {
+	if a < b {
 		return a
 	}
 	return b
